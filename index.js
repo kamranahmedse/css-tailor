@@ -144,10 +144,14 @@ var generateCss = function (extractedValues) {
             object: {}
         };
 
+    // For each of the extracted attribute values, parse each value
     extractedValues.forEach(function (attrValue) {
-        attrValue = attrValue.replace(/\s+/g, ' ');
 
+        attrValue = attrValue.replace(/\s+/g, ' ');
         var valueItems = attrValue.split(' ');
+
+        // Since each value can have multiple properties (e.g. `p10 mt40`)
+        // Split each value and iterate to generate any possible CSS
         valueItems.forEach(function (valueItem) {
 
             var css = getMappedCss(valueItem);
@@ -155,6 +159,7 @@ var generateCss = function (extractedValues) {
                 return;
             }
 
+            // Assemble CSS in the form of minified content, beautified content and object
             tailoredCss['minified'] += css.selector + '{' + css.property + ':' + css.value + '}';
             tailoredCss['beautified'] += css.selector + ' {' + config.newLineChar +
                 tabSpacing + css.property + ':' + css.value + ';' + config.newLineChar +
@@ -176,7 +181,15 @@ var generateCss = function (extractedValues) {
 
 module.exports = {
 
+    /**
+     * Generate CSS from HTML string
+     *
+     * @param htmlContent
+     * @param options
+     * @returns {{minified: '', beautified: '', object: {}}}
+     */
     tailorContent: function (htmlContent, options) {
+
         var extractedValues = extractAttributes(lookupRegex, htmlContent);
 
         if (!extractedValues || extractedValues.length === 0) {
@@ -184,10 +197,16 @@ module.exports = {
             return '';
         }
 
-        var css = generateCss(extractedValues);
-        console.log(css);
+        return generateCss(extractedValues);
     },
 
+    /**
+     * Generate CSS for any HTML files at provided paths
+     *
+     * @param paths
+     * @param options
+     * @returns {*|string}
+     */
     tailorPath: function (paths, options) {
 
         var htmlContent = '';
