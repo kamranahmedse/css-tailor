@@ -1,5 +1,6 @@
 var path = require('path'),
     fs = require('fs'),
+    mkdirp = require('mkdirp'),
     _ = require('lodash');
 
 /**
@@ -14,7 +15,9 @@ var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)
  */
 var config = {
     newLineChar: '\n',
-    tabSpacing: 4
+    tabSpacing: 4,
+    outputPath: '',
+    minifyOutput: false
 };
 
 /**
@@ -32,7 +35,7 @@ var propertyMapping = {
      *
      * @type {RegExp}
      */
-    regex: /(^[a-z]{1,23})([0-9]{1,4})?/,
+    regex: /(^[a-z]{1,23})([0-9]{1,4})(\w*)/,
 
     /**
      * Aliases mapping to their relevant CSS properties
@@ -71,11 +74,6 @@ var propertyMapping = {
  * @param callback  Function which will be called for every found file
  */
 var getFiles = function (dirPath, callback) {
-
-    if (!fs.existsSync(dirPath)) {
-        console.error("Path does not exist", dirPath);
-        return;
-    }
 
     var files = fs.readdirSync(dirPath);
     files.forEach(function (file) {
@@ -140,7 +138,7 @@ var generateCss = function (extractedValues) {
     var tabSpacing = _.repeat(' ', config.tabSpacing),
         tailoredCss = {
             minified: '',
-            beautified: '',
+            normal: '',
             object: {}
         };
 
@@ -159,11 +157,11 @@ var generateCss = function (extractedValues) {
                 return;
             }
 
-            // Assemble CSS in the form of minified content, beautified content and object
-            tailoredCss['minified'] += css.selector + '{' + css.property + ':' + css.value + '}';
-            tailoredCss['beautified'] += css.selector + ' {' + config.newLineChar +
-                tabSpacing + css.property + ':' + css.value + ';' + config.newLineChar +
-                '}' + config.newLineChar;
+            // Assemble CSS in the form of minified content, normal content and object
+            tailoredCss['minified'] += css.selector + '{' + css.property + ':' + css.value + ';}';
+            tailoredCss['normal'] += css.selector + ' {' + config.newLineChar +
+                tabSpacing + css.property + ': ' + css.value + ';' + config.newLineChar +
+                '}' + config.newLineChar + config.newLineChar;
 
             tailoredCss['object'][css.selector] = {
                 properties: [
@@ -205,18 +203,53 @@ var readHtmlFile = function (filePath) {
  */
 var getPathHtml = function (location) {
 
-    var htmlContent = '',
-        lstat = fs.lstatSync(location);
-
-    if (lstat.isDirectory()) {
-        getFiles(location, function (filePath) {
-            htmlContent += readHtmlFile(filePath);
-        });
-    } else if (lstat.isFile()) {
-        htmlContent += readHtmlFile(location);
+    if (!_.isString(location)) {
+        throw 'Location must be string ' + (typeof location) + ' given';
     }
 
-    return htmlContent;
+    try {
+        var htmlContent = '',
+            lstat = fs.lstatSync(location);
+
+        if (lstat.isDirectory()) {
+            getFiles(location, function (filePath) {
+                htmlContent += readHtmlFile(filePath);
+            });
+        } else if (lstat.isFile()) {
+            htmlContent += readHtmlFile(location);
+        }
+
+        return htmlContent;
+    } catch (e) {
+        return '';
+    }
+};
+
+/**
+ * Creates the output file using the generated CSS
+ * @param css
+ */
+var createOutputFile = function (css) {
+
+    if (!css || !config.outputPath) {
+        return;
+    }
+
+    var contents = config.minifyOutput ? css.minified : css.normal,
+        outputPath = config.outputPath;
+
+    if (!_.endsWith(outputPath, '.css')) {
+        throw 'Error! Full output path is required including css filename e.g. /assets/css/tailored.css';
+    }
+
+    mkdirp(path.dirname(outputPath), function (error) {
+        if (error) {
+            console.warn(error);
+            throw "Unable to generate tailored CSS";
+        }
+
+        fs.writeFile(outputPath, contents);
+    });
 };
 
 module.exports = {
@@ -226,18 +259,25 @@ module.exports = {
      *
      * @param htmlContent
      * @param options
-     * @returns {{}|{minified: '', beautified: '', object: {}}}
+     * @returns {{}|{minified: '', normal: '', object: {}}}
      */
     tailorContent: function (htmlContent, options) {
 
-        var extractedValues = extractAttributeValues(lookupRegex, htmlContent);
+        options = options || {};
+        config = _.merge(config, options);
+
+        var extractedValues = extractAttributeValues(lookupRegex, htmlContent),
+            generatedCss = {};
 
         if (!extractedValues || extractedValues.length === 0) {
-            console.warn('No properties found to tailor CSS');
             return {};
         }
 
-        return generateCss(extractedValues);
+        generatedCss = generateCss(extractedValues);
+
+        createOutputFile(generatedCss);
+
+        return generatedCss;
     },
 
     /**

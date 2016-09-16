@@ -13,7 +13,8 @@
     "test": "mocha"
   },
   "dependencies": {
-    "lodash": "^4.15.0"
+    "lodash": "^4.15.0",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "mocha": "^3.0.2"
