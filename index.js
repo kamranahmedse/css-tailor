@@ -1,52 +1,73 @@
 var path = require('path'),
     fs = require('fs'),
-    _ = require('lodash'),
-    util = require('util');
+    _ = require('lodash');
 
-var defaultOptions = {},
-    lookupRegex = /(?:(\bclass\b)\s*=\s*("[^"]*"|'[^']*'|[^"'<>\s]+)\s*)+/;
+var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
 
 /**
  * Gets files from the passed path recursively
  *
- * @param path      Path to get the files from
+ * @param dirPath      Path to get the files from
  * @param callback  Function which will be called for every found file
  */
-var getFiles = function (path, callback) {
-    if (!fs.existsSync(path)) {
-        console.error("Path does not exist", path);
+var getFiles = function (dirPath, callback) {
+
+    if (!fs.existsSync(dirPath)) {
+        console.error("Path does not exist", dirPath);
         return;
     }
 
-    var files = fs.readdirSync(path);
+    var files = fs.readdirSync(dirPath);
     files.forEach(function (file) {
-        var fileName = path.join(path, file),
+        var fileName = path.join(dirPath, file),
             stat = fs.lstatSync(fileName);
 
         if (stat.isDirectory()) {
-            getFiles(fileName); //recurse
+            getFiles(fileName, callback); //recurse
         } else {
             callback(fileName);
         }
     });
 };
 
+/**
+ * Extracts the attribute values from the passed HTML content
+ * @param attrRegex
+ * @param htmlContent
+ * @returns {Array}
+ */
+var extractAttributes = function (attrRegex, htmlContent) {
+    var matches = [],
+        match;
+
+    do {
+        match = attrRegex.exec(htmlContent);
+        match && match[2] && matches.push(match[2].trim());
+    } while (match);
+
+    return _.uniq(matches);
+};
+
 module.exports = {
 
     tailorContent: function (htmlContent, options) {
-        console.log(htmlContent);
+        var classNames = extractAttributes(lookupRegex, htmlContent);
+        console.log(classNames);
     },
 
-    tailorPath: function (path, options) {
-        var htmlContent = '';
-        getFiles(path, function (filePath) {
-            var extension = fs.extname(filePath) || '';
+    tailorPath: function (paths, options) {
 
-            if (extension.toLowerCase() == 'html') {
+        var htmlContent = '';
+
+        getFiles(paths, function (filePath) {
+            var extension = path.extname(filePath) || '';
+
+            if (extension.toLowerCase() == '.html') {
                 htmlContent += fs.readFileSync(filePath);
             }
         });
 
         this.tailorContent(htmlContent, options);
     }
+
 };
