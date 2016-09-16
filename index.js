@@ -97,7 +97,7 @@ var getFiles = function (dirPath, callback) {
  * @param htmlContent
  * @returns {Array}
  */
-var extractAttributes = function (attrRegex, htmlContent) {
+var extractAttributeValues = function (attrRegex, htmlContent) {
 
     var matches = [],
         match;
@@ -179,6 +179,46 @@ var generateCss = function (extractedValues) {
     return tailoredCss;
 };
 
+/**
+ * Gets the file content if it is an HTML file
+ *
+ * @param filePath
+ * @returns {string}
+ */
+var readHtmlFile = function (filePath) {
+
+    var extension = path.extname(filePath) || '',
+        html = '';
+
+    if (extension.toLowerCase() == '.html') {
+        html = fs.readFileSync(filePath);
+    }
+
+    return html;
+};
+
+/**
+ * Gets the HTML content from the passed path
+ *
+ * @param location
+ * @returns {string}
+ */
+var getPathHtml = function (location) {
+
+    var htmlContent = '',
+        lstat = fs.lstatSync(location);
+
+    if (lstat.isDirectory()) {
+        getFiles(location, function (filePath) {
+            htmlContent += readHtmlFile(filePath);
+        });
+    } else if (lstat.isFile()) {
+        htmlContent += readHtmlFile(location);
+    }
+
+    return htmlContent;
+};
+
 module.exports = {
 
     /**
@@ -186,15 +226,15 @@ module.exports = {
      *
      * @param htmlContent
      * @param options
-     * @returns {{minified: '', beautified: '', object: {}}}
+     * @returns {{}|{minified: '', beautified: '', object: {}}}
      */
     tailorContent: function (htmlContent, options) {
 
-        var extractedValues = extractAttributes(lookupRegex, htmlContent);
+        var extractedValues = extractAttributeValues(lookupRegex, htmlContent);
 
         if (!extractedValues || extractedValues.length === 0) {
             console.warn('No properties found to tailor CSS');
-            return '';
+            return {};
         }
 
         return generateCss(extractedValues);
@@ -203,7 +243,7 @@ module.exports = {
     /**
      * Generate CSS for any HTML files at provided paths
      *
-     * @param paths
+     * @param paths Array|string
      * @param options
      * @returns {*|string}
      */
@@ -211,13 +251,13 @@ module.exports = {
 
         var htmlContent = '';
 
-        getFiles(paths, function (filePath) {
-            var extension = path.extname(filePath) || '';
-
-            if (extension.toLowerCase() == '.html') {
-                htmlContent += fs.readFileSync(filePath);
-            }
-        });
+        if (_.isArray(paths)) {
+            paths.forEach(function (location) {
+                htmlContent += getPathHtml(location);
+            });
+        } else if (_.isString(paths)) {
+            htmlContent += getPathHtml(paths);
+        }
 
         return this.tailorContent(htmlContent, options);
     }
