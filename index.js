@@ -9,6 +9,15 @@ var path = require('path'),
 var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
 
 /**
+ * Configuration variables
+ * @type {Object}
+ */
+var config = {
+    newLineChar: '\n',
+    tabSpacing: 4
+};
+
+/**
  * Mapping for the numerical properties to their respective CSS property. Later on we may
  * have another object for full property values i.e. pos-r for position relative etc.
  *
@@ -102,6 +111,12 @@ var extractAttributes = function (attrRegex, htmlContent) {
     return _.uniq(matches);
 };
 
+/**
+ * Gets the mapped CSS from the provided property if possible; Otherwise null
+ *
+ * @param property
+ * @returns {null|Object}
+ */
 var getMappedCss = function (property) {
 
     var pieces = property.match(propertyMapping.regex),
@@ -114,15 +129,22 @@ var getMappedCss = function (property) {
         };
 };
 
-var generateCss = function (attrValues) {
+/**
+ * Generates the CSS from the extracted attribute values
+ *
+ * @param extractedValues
+ * @returns {Object}
+ */
+var generateCss = function (extractedValues) {
 
-    var tailoredCss = {
-        minified: '',
-        beautified: '',
-        object: {}
-    };
+    var tabSpacing = _.repeat(' ', config.tabSpacing),
+        tailoredCss = {
+            minified: '',
+            beautified: '',
+            object: {}
+        };
 
-    attrValues.forEach(function (attrValue) {
+    extractedValues.forEach(function (attrValue) {
         attrValue = attrValue.replace(/\s+/g, ' ');
 
         var valueItems = attrValue.split(' ');
@@ -134,7 +156,9 @@ var generateCss = function (attrValues) {
             }
 
             tailoredCss['minified'] += css.selector + '{' + css.property + ':' + css.value + '}';
-            tailoredCss['beautified'] += css.selector + ' {' + css.property + ':' + css.value + '}';
+            tailoredCss['beautified'] += css.selector + ' {' + config.newLineChar +
+                tabSpacing + css.property + ':' + css.value + ';' + config.newLineChar +
+                '}' + config.newLineChar;
 
             tailoredCss['object'][css.selector] = {
                 properties: [
@@ -150,21 +174,17 @@ var generateCss = function (attrValues) {
     return tailoredCss;
 };
 
-var tailorCss = function (attrValues) {
-
-};
-
 module.exports = {
 
     tailorContent: function (htmlContent, options) {
-        var attrValues = extractAttributes(lookupRegex, htmlContent);
+        var extractedValues = extractAttributes(lookupRegex, htmlContent);
 
-        if (!attrValues || attrValues.length === 0) {
+        if (!extractedValues || extractedValues.length === 0) {
             console.warn('No properties found to tailor CSS');
             return '';
         }
 
-        var css = generateCss(attrValues);
+        var css = generateCss(extractedValues);
         console.log(css);
     },
 
