@@ -75,7 +75,7 @@ var propertyMapping = {
  * @type {Object}
  */
 var unitMapping = {
-    default: 'px',  // If no mapping found or empty unit given then use this
+    default: 'px',      // If no mapping found or empty unit given then use this
     px: 'px',
     pt: 'pt',
     em: 'em',
