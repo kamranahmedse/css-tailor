@@ -26,6 +26,29 @@ describe('tailor-js', function () {
         done();
     });
 
+    it('can optionally set all styles to important', function (done) {
+        var generatedCss = tailor.tailorContent('<div class="container pt30"></div>', {
+            setImportant: true
+        });
+        var expectedCss = {
+            minified: '.pt30{padding-top:30px !important;}',
+            formatted: '[Not Adding - It would be messy to add here]',
+            object: {
+                ".pt30": {
+                    properties: [{
+                        property: 'padding-top',
+                        value: '30px !important'
+                    }]
+                }
+            }
+        };
+
+        assert.equal(generatedCss.minified, expectedCss.minified);
+        assert.equal(JSON.stringify(generatedCss.object), JSON.stringify(expectedCss.object));
+
+        done();
+    });
+
     it('returns empty object when there are no required properties', function (done) {
         var generatedCss = tailor.tailorContent('<div class="container"></div>');
         var expectedCss = {
@@ -201,7 +224,7 @@ describe('tailor-js', function () {
         var generatedContent = fs.readFileSync(outputFilePath);
         assert.equal(generatedContent, expectedCss.minified);
 
-        // Remove the generated file
+        // Remove any existing generated file
         fs.unlinkSync(outputFilePath);
         fs.rmdirSync(__dirname + '/fixtures/assets/css');
         fs.rmdirSync(__dirname + '/fixtures/assets');
@@ -248,7 +271,7 @@ describe('tailor-js', function () {
         var generatedContent = fs.readFileSync(outputFilePath);
         assert.equal(generatedContent, expectedCss.formatted);
 
-        // Remove the generated file
+        // Remove any existing generated file
         fs.unlinkSync(outputFilePath);
         fs.rmdirSync(__dirname + '/fixtures/assets/css');
         fs.rmdirSync(__dirname + '/fixtures/assets');
