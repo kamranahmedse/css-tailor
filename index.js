@@ -288,7 +288,7 @@ module.exports = {
      * @param options
      * @returns {{}|{minified: '', formatted: '', object: {}}}
      */
-    tailorContent: function (htmlContent, options) {
+    generateCss: function (htmlContent, options) {
 
         var tempDefaults = _.cloneDeep(defaults);
 
@@ -320,7 +320,7 @@ module.exports = {
      * @param options
      * @returns {*|string}
      */
-    tailorPath: function (paths, options) {
+    generatePathCss: function (paths, options) {
 
         var htmlContent = '';
 
@@ -332,7 +332,7 @@ module.exports = {
             htmlContent += getPathHtml(paths);
         }
 
-        return this.tailorContent(htmlContent, options);
+        return this.generateCss(htmlContent, options);
     }
 
 };

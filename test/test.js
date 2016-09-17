@@ -6,7 +6,7 @@ var path = require('path');
 describe('tailor-js', function () {
 
     it('can generate css from html string', function (done) {
-        var generatedCss = tailor.tailorContent('<div class="container pt30"></div>');
+        var generatedCss = tailor.generateCss('<div class="container pt30"></div>');
         var expectedCss = {
             minified: '.pt30{padding-top:30px;}',
             formatted: '[Not Adding - It would be messy to add here]',
@@ -27,7 +27,7 @@ describe('tailor-js', function () {
     });
 
     it('can optionally set all styles to important', function (done) {
-        var generatedCss = tailor.tailorContent('<div class="container pt30"></div>', {
+        var generatedCss = tailor.generateCss('<div class="container pt30"></div>', {
             setImportant: true
         });
         var expectedCss = {
@@ -50,7 +50,7 @@ describe('tailor-js', function () {
     });
 
     it('returns empty object when there are no required properties', function (done) {
-        var generatedCss = tailor.tailorContent('<div class="container"></div>');
+        var generatedCss = tailor.generateCss('<div class="container"></div>');
         var expectedCss = {
             minified: '',
             formatted: '',
@@ -64,7 +64,7 @@ describe('tailor-js', function () {
     });
 
     it('can read and assign units from selector', function (done) {
-        var generatedCss = tailor.tailorContent('<div class="container w30em fs40"><span class="head fw600n"></span><span class="w40p"></span></div>');
+        var generatedCss = tailor.generateCss('<div class="container w30em fs40"><span class="head fw600n"></span><span class="w40p"></span></div>');
         var expectedCss = {
             minified: '.w30em{width:30em;}.fs40{font-size:40px;}.fw600n{font-weight:600;}.w40p{width:40%;}',
             formatted: '[Not Adding - It would be messy to add here]',
@@ -102,7 +102,7 @@ describe('tailor-js', function () {
     });
 
     it('can take HTML from file and generate CSS', function (done) {
-        var generatedCss = tailor.tailorPath(__dirname + '/fixtures/demo-1.html');
+        var generatedCss = tailor.generatePathCss(__dirname + '/fixtures/demo-1.html');
         var expectedCss = {
             minified: '.w1200{width:1200px;}',
             formatted: '[Not Adding - It would be messy to add here]',
@@ -121,7 +121,7 @@ describe('tailor-js', function () {
     });
 
     it('can read HTML files from any directory depth and generate CSS', function (done) {
-        var generatedCss = tailor.tailorPath(__dirname + '/fixtures/');
+        var generatedCss = tailor.generatePathCss(__dirname + '/fixtures/');
         var expectedCss = {
             minified: '.w1200{width:1200px;}.p40{padding:40px;}.mb30{margin-bottom:30px;}',
             formatted: '[Not Adding - It would be messy to add here]',
@@ -152,7 +152,7 @@ describe('tailor-js', function () {
     });
 
     it('can read HTML and generate CSS from an array of paths', function (done) {
-        var generatedCss = tailor.tailorPath([
+        var generatedCss = tailor.generatePathCss([
             __dirname + '/fixtures/demo-1.html',
             __dirname + '/fixtures/sample-dir'
         ]);
@@ -188,7 +188,7 @@ describe('tailor-js', function () {
     it('can generate minified CSS file', function (done) {
 
         var outputFilePath = __dirname + '/fixtures/assets/css/tailored.min.css',
-            generatedCss = tailor.tailorPath(__dirname + '/fixtures/', {
+            generatedCss = tailor.generatePathCss(__dirname + '/fixtures/', {
                 outputPath: outputFilePath,
                 minifyOutput: true
             });
@@ -235,7 +235,7 @@ describe('tailor-js', function () {
     it('can generate formatted CSS file', function (done) {
 
         var outputFilePath = __dirname + '/fixtures/assets/css/tailored.css',
-            generatedCss = tailor.tailorPath(__dirname + '/fixtures/', {
+            generatedCss = tailor.generatePathCss(__dirname + '/fixtures/', {
                 outputPath: outputFilePath,
                 minifyOutput: false
             });
