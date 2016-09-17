@@ -41,9 +41,9 @@ describe('tailor-js', function () {
     });
 
     it('can read and assign units from selector', function (done) {
-        var generatedCss = tailor.tailorContent('<div class="container w30em"></div>');
+        var generatedCss = tailor.tailorContent('<div class="container w30em fs40"><span class="head fw600n"></span><span class="w40p"></span></div>');
         var expectedCss = {
-            minified: '.w30em{width:30em;}',
+            minified: '.w30em{width:30em;}.fs40{font-size:40px;}.fw600n{font-weight:600;}.w40p{width:40%;}',
             formatted: '[Not Adding - It would be messy to add here]',
             object: {
                 ".w30em": {
@@ -51,15 +51,34 @@ describe('tailor-js', function () {
                         property: 'width',
                         value: '30em'
                     }]
+                },
+                ".fs40": {
+                    properties: [{
+                        property: 'font-size',
+                        value: '40px'
+                    }]
+                },
+                ".fw600n": {
+                    properties: [{
+                        property: 'font-weight',
+                        value: '600'
+                    }]
+                },
+                ".w40p": {
+                    properties: [{
+                        property: 'width',
+                        value: '40%'
+                    }]
                 }
             }
         };
 
         assert.equal(generatedCss.minified, expectedCss.minified);
+        assert.equal(JSON.stringify(generatedCss.object), JSON.stringify(expectedCss.object));
         done();
     });
 
-    it('can take generate CSS from file', function (done) {
+    it('can take HTML from file and generate CSS', function (done) {
         var generatedCss = tailor.tailorPath(__dirname + '/fixtures/demo-1.html');
         var expectedCss = {
             minified: '.w1200{width:1200px;}',
