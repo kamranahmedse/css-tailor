@@ -138,7 +138,7 @@ var generateCss = function (extractedValues) {
     var tabSpacing = _.repeat(' ', config.tabSpacing),
         tailoredCss = {
             minified: '',
-            normal: '',
+            formatted: '',
             object: {}
         };
 
@@ -157,9 +157,9 @@ var generateCss = function (extractedValues) {
                 return;
             }
 
-            // Assemble CSS in the form of minified content, normal content and object
+            // Assemble CSS in the form of minified content, formatted content and object
             tailoredCss['minified'] += css.selector + '{' + css.property + ':' + css.value + ';}';
-            tailoredCss['normal'] += css.selector + ' {' + config.newLineChar +
+            tailoredCss['formatted'] += css.selector + ' {' + config.newLineChar +
                 tabSpacing + css.property + ': ' + css.value + ';' + config.newLineChar +
                 '}' + config.newLineChar + config.newLineChar;
 
@@ -206,23 +206,19 @@ var getPathHtml = function (location) {
     if (!_.isString(location)) {
         throw 'Location must be string ' + (typeof location) + ' given';
     }
+    
+    var htmlContent = '',
+        lstat = fs.lstatSync(location);
 
-    try {
-        var htmlContent = '',
-            lstat = fs.lstatSync(location);
-
-        if (lstat.isDirectory()) {
-            getFiles(location, function (filePath) {
-                htmlContent += readHtmlFile(filePath);
-            });
-        } else if (lstat.isFile()) {
-            htmlContent += readHtmlFile(location);
-        }
-
-        return htmlContent;
-    } catch (e) {
-        return '';
+    if (lstat.isDirectory()) {
+        getFiles(location, function (filePath) {
+            htmlContent += readHtmlFile(filePath);
+        });
+    } else if (lstat.isFile()) {
+        htmlContent += readHtmlFile(location);
     }
+
+    return htmlContent;
 };
 
 /**
@@ -235,7 +231,7 @@ var createOutputFile = function (css) {
         return;
     }
 
-    var contents = config.minifyOutput ? css.minified : css.normal,
+    var contents = config.minifyOutput ? css.minified : css.formatted,
         outputPath = config.outputPath;
 
     if (!_.endsWith(outputPath, '.css')) {
@@ -259,7 +255,7 @@ module.exports = {
      *
      * @param htmlContent
      * @param options
-     * @returns {{}|{minified: '', normal: '', object: {}}}
+     * @returns {{}|{minified: '', formatted: '', object: {}}}
      */
     tailorContent: function (htmlContent, options) {
 
@@ -270,7 +266,11 @@ module.exports = {
             generatedCss = {};
 
         if (!extractedValues || extractedValues.length === 0) {
-            return {};
+            return {
+                minified: '',
+                formatted: '',
+                object: {}
+            };
         }
 
         generatedCss = generateCss(extractedValues);
