@@ -206,7 +206,7 @@ var getPathHtml = function (location) {
     if (!_.isString(location)) {
         throw 'Location must be string ' + (typeof location) + ' given';
     }
-    
+
     var htmlContent = '',
         lstat = fs.lstatSync(location);
 
@@ -231,6 +231,7 @@ var createOutputFile = function (css) {
         return;
     }
 
+
     var contents = config.minifyOutput ? css.minified : css.formatted,
         outputPath = config.outputPath;
 
@@ -238,14 +239,8 @@ var createOutputFile = function (css) {
         throw 'Error! Full output path is required including css filename e.g. /assets/css/tailored.css';
     }
 
-    mkdirp(path.dirname(outputPath), function (error) {
-        if (error) {
-            console.warn(error);
-            throw "Unable to generate tailored CSS";
-        }
-
-        fs.writeFile(outputPath, contents);
-    });
+    mkdirp.sync(path.dirname(outputPath));
+    fs.writeFileSync(outputPath, contents);
 };
 
 module.exports = {
