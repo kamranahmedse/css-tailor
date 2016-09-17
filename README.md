@@ -102,4 +102,4 @@ All the default CSS units are supported. You can specify it and relevant CSS uni
 
 ## License
 
-[MIT license](http://opensource.org/licenses/mit-license.php)
+MIT &copy; [Kamran Ahmed](http://kamranahmed.info) 
