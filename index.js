@@ -68,6 +68,28 @@ var propertyMapping = {
 };
 
 /**
+ * Defines the mapping for characters to their relevant units
+ *
+ * @type {Object}
+ */
+var unitMapping = {
+    default: 'px',  // If no mapping found or empty unit given then use this
+    px: 'px',
+    pt: 'pt',
+    em: 'em',
+    p: '%',
+    vh: 'vh',
+    vw: 'vw',
+    vmin: 'vmin',
+    ex: 'ex',
+    cm: 'cm',
+    in: 'in',
+    mm: 'mm',
+    pc: 'pc',
+    n: ''       // None
+};
+
+/**
  * Gets files from the passed path recursively
  *
  * @param dirPath      Path to get the files from
@@ -110,6 +132,18 @@ var extractAttributeValues = function (attrRegex, htmlContent) {
 };
 
 /**
+ * Gets the mapping for the
+ * @param actualUnit
+ * @returns {string}
+ */
+var getUnit = function (actualUnit) {
+    actualUnit = actualUnit || '';
+    actualUnit = actualUnit.trim();
+
+    return (unitMapping[actualUnit] === undefined) ? unitMapping.default : unitMapping[actualUnit];
+};
+
+/**
  * Gets the mapped CSS from the provided property if possible; Otherwise null
  *
  * @param property
@@ -123,7 +157,7 @@ var getMappedCss = function (property) {
     return cssProperty && {
             selector: '.' + property,
             property: cssProperty,
-            value: pieces[2] + (pieces[3] || 'px')
+            value: pieces[2] + getUnit(pieces[3] || unitMapping.default)
         };
 };
 
