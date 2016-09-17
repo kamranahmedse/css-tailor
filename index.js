@@ -13,12 +13,14 @@ var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)
  * Configuration variables
  * @type {Object}
  */
-var config = {
-    newLineChar: '\n',
-    tabSpacing: 4,
-    outputPath: '',
-    minifyOutput: false
-};
+var config = {},
+    defaults = {
+        newLineChar: '\n',
+        tabSpacing: 4,
+        outputPath: '',
+        minifyOutput: false,
+        setImportant: false
+    };
 
 /**
  * Mapping for the numerical properties to their respective CSS property. Later on we may
@@ -157,7 +159,7 @@ var getMappedCss = function (property) {
     return cssProperty && {
             selector: '.' + property,
             property: cssProperty,
-            value: pieces[2] + getUnit(pieces[3] || unitMapping.default)
+            value: pieces[2] + getUnit(pieces[3] || unitMapping.default) + (config.setImportant ? ' !important' : '')
         };
 };
 
@@ -288,8 +290,10 @@ module.exports = {
      */
     tailorContent: function (htmlContent, options) {
 
+        var tempDefaults = _.cloneDeep(defaults);
+
         options = options || {};
-        config = _.merge(config, options);
+        config = _.merge(tempDefaults, options);
 
         var extractedValues = extractAttributeValues(lookupRegex, htmlContent),
             generatedCss = {};
