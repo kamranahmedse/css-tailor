@@ -1,5 +1,7 @@
 var assert = require('assert');
 var tailor = require('../');
+var fs = require('fs');
+var path = require('path');
 
 describe('tailor-js', function () {
 
@@ -19,6 +21,8 @@ describe('tailor-js', function () {
         };
 
         assert.equal(generatedCss.minified, expectedCss.minified);
+        assert.equal(JSON.stringify(generatedCss.object), JSON.stringify(expectedCss.object));
+
         done();
     });
 
@@ -31,6 +35,8 @@ describe('tailor-js', function () {
         };
 
         assert.equal(JSON.stringify(generatedCss), JSON.stringify(expectedCss));
+        assert.equal(JSON.stringify(generatedCss.object), JSON.stringify(expectedCss.object));
+
         done();
     });
 
@@ -134,6 +140,100 @@ describe('tailor-js', function () {
         };
 
         assert.equal(generatedCss.minified, expectedCss.minified);
+        done();
+    });
+
+    it('can generate minified CSS file', function (done) {
+
+        var outputFilePath = __dirname + '/fixtures/assets/css/tailored.min.css',
+            generatedCss = tailor.tailorPath(__dirname + '/fixtures/', {
+                outputPath: outputFilePath,
+                minifyOutput: true
+            });
+
+        var expectedCss = {
+            minified: '.w1200{width:1200px;}.p40{padding:40px;}.mb30{margin-bottom:30px;}',
+            formatted: '[Not Adding - It would be messy to add here]',
+            object: {
+                ".w1200": {
+                    properties: [{
+                        property: 'width',
+                        value: '1200px'
+                    }]
+                },
+                ".p40": {
+                    properties: [{
+                        property: 'padding',
+                        value: '40px'
+                    }]
+                },
+                ".mb30": {
+                    properties: [{
+                        property: 'margin-bottom',
+                        value: '30px'
+                    }]
+                }
+            }
+        };
+
+        var lstat = fs.lstatSync(outputFilePath);
+        assert.equal(lstat.isFile(), true);
+
+        var generatedContent = fs.readFileSync(outputFilePath);
+        assert.equal(generatedContent, expectedCss.minified);
+
+        // Remove the generated file
+        fs.unlinkSync(outputFilePath);
+        fs.rmdirSync(__dirname + '/fixtures/assets/css');
+        fs.rmdirSync(__dirname + '/fixtures/assets');
+
+        done();
+    });
+
+    it('can generate formatted CSS file', function (done) {
+
+        var outputFilePath = __dirname + '/fixtures/assets/css/tailored.css',
+            generatedCss = tailor.tailorPath(__dirname + '/fixtures/', {
+                outputPath: outputFilePath,
+                minifyOutput: false
+            });
+
+        var expectedCss = {
+            minified: '.w1200{width:1200px;}.p40{padding:40px;}.mb30{margin-bottom:30px;}',
+            formatted: '.w1200 {\n    width: 1200px;\n}\n\n.p40 {\n    padding: 40px;\n}\n\n.mb30 {\n    margin-bottom: 30px;\n}\n\n',
+            object: {
+                ".w1200": {
+                    properties: [{
+                        property: 'width',
+                        value: '1200px'
+                    }]
+                },
+                ".p40": {
+                    properties: [{
+                        property: 'padding',
+                        value: '40px'
+                    }]
+                },
+                ".mb30": {
+                    properties: [{
+                        property: 'margin-bottom',
+                        value: '30px'
+                    }]
+                }
+            }
+        };
+
+        var lstat = fs.lstatSync(outputFilePath);
+        assert.equal(lstat.isFile(), true);
+
+        var generatedContent = fs.readFileSync(outputFilePath);
+        assert.equal(generatedContent, expectedCss.formatted);
+
+        // Remove the generated file
+        fs.unlinkSync(outputFilePath);
+        fs.rmdirSync(__dirname + '/fixtures/assets/css');
+        fs.rmdirSync(__dirname + '/fixtures/assets');
+
         done();
     });
 });
