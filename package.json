@@ -1,14 +1,19 @@
 {
   "name": "css-tailor",
+  "description": "Tailor CSS from the HTML classes",
   "version": "1.0.0",
-  "description": "Easily generate CSS from the HTML classes",
   "main": "index.js",
   "author": "Kamran Ahmed <kamranahmed.se@gmail.com>",
+  "keywords": [
+    "css",
+    "css-tailor",
+    "css tailor",
+    "tailor"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/kamranahmedse/css-tailor"
   },
-  "license": "MIT",
   "scripts": {
     "test": "mocha"
   },
@@ -18,5 +23,9 @@
   },
   "devDependencies": {
     "mocha": "^3.0.2"
-  }
+  },
+  "engines": {
+    "node": ">= 0.10"
+  },
+  "license": "MIT"
 }
