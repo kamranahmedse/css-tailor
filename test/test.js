@@ -1,3 +1,5 @@
+"use strict";
+
 var assert = require('assert');
 var tailor = require('../');
 var fs = require('fs');
