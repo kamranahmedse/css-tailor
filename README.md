@@ -1,4 +1,4 @@
-# css-tailor
+# ✂ css-tailor
 [![Build Status](https://secure.travis-ci.org/kamranahmedse/css-tailor.png?branch=master)](https://travis-ci.org/kamranahmedse/css-tailor)
 > Automatically generate CSS from your HTML classes
 
