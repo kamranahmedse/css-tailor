@@ -14,6 +14,8 @@ var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)
  * @type {Object}
  */
 var config = {},
+    lazyHtml = '',      // Will be holding `HTML` when running in lazy generation
+    lazyPaths = [],     // Will be holding `paths` when running in lazy generation
     defaults = {
         newLineChar: '\n',
         tabSpacing: 4,
@@ -237,10 +239,10 @@ var readHtmlFile = function (filePath) {
  * @param location
  * @returns {string}
  */
-var getPathHtml = function (location) {
+var pathToHtml = function (location) {
 
     if (!_.isString(location)) {
-        throw 'Location must be string ' + (typeof location) + ' given';
+        throw 'Error! pathToHtml: Location must be string ' + (typeof location) + ' given';
     }
 
     var htmlContent = '',
@@ -279,7 +281,67 @@ var createOutputFile = function (css) {
     fs.writeFileSync(outputPath, contents);
 };
 
+/**
+ * Generates HTML from the given paths
+ *
+ * @param paths
+ * @returns {string}
+ */
+var pathsToHtml = function (paths) {
+
+    var htmlContent = '';
+
+    if (_.isArray(paths)) {
+        paths.forEach(function (location) {
+            htmlContent += pathToHtml(location);
+        });
+    } else if (_.isString(paths)) {
+        htmlContent += pathToHtml(paths);
+    }
+
+    return htmlContent;
+};
+
 module.exports = {
+
+    /**
+     * Pushes HTML for the lazy generation
+     * @param htmlContent
+     */
+    pushHtml: function (htmlContent) {
+        lazyHtml += htmlContent;
+    },
+
+    /**
+     * Pushes path for the lazy generation
+     * @param path
+     */
+    pushPath: function (path) {
+        lazyPaths.push(path);
+    },
+
+    /**
+     * Generates CSS from the lazily set content
+     *
+     * @returns {Object}
+     */
+    generateLazy: function () {
+
+        if (_.isEmpty(lazyHtml) && _.isEmpty(lazyPaths)) {
+            throw 'Error! No HTML or path given for lazy generation';
+        }
+
+        var htmlContent = '';
+
+        htmlContent += pathsToHtml(lazyPaths);
+        htmlContent += lazyHtml;
+
+        // Reset lazy variables
+        lazyPaths = '';
+        lazyHtml = [];
+
+        return this.generateCss(htmlContent);
+    },
 
     /**
      * Generate CSS from HTML string
@@ -322,15 +384,11 @@ module.exports = {
      */
     generatePathCss: function (paths, options) {
 
-        var htmlContent = '';
-
-        if (_.isArray(paths)) {
-            paths.forEach(function (location) {
-                htmlContent += getPathHtml(location);
-            });
-        } else if (_.isString(paths)) {
-            htmlContent += getPathHtml(paths);
+        if (_.isEmpty(paths)) {
+            throw 'Error! path is required';
         }
+
+        var htmlContent = pathsToHtml(paths);
 
         return this.generateCss(htmlContent, options);
     }

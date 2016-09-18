@@ -121,17 +121,11 @@ describe('tailor-js', function () {
     });
 
     it('can read HTML files from any directory depth and generate CSS', function (done) {
-        var generatedCss = tailor.generatePathCss(__dirname + '/fixtures/');
+        var generatedCss = tailor.generatePathCss(__dirname + '/fixtures/sample-dir-2/');
         var expectedCss = {
-            minified: '.w1200{width:1200px;}.p40{padding:40px;}.mb30{margin-bottom:30px;}',
+            minified: '.p40{padding:40px;}.mb30{margin-bottom:30px;}.w1200{width:1200px;}',
             formatted: '[Not Adding - It would be messy to add here]',
             object: {
-                ".w1200": {
-                    properties: [{
-                        property: 'width',
-                        value: '1200px'
-                    }]
-                },
                 ".p40": {
                     properties: [{
                         property: 'padding',
@@ -142,6 +136,12 @@ describe('tailor-js', function () {
                     properties: [{
                         property: 'margin-bottom',
                         value: '30px'
+                    }]
+                },
+                ".w1200": {
+                    properties: [{
+                        property: 'width',
+                        value: '1200px'
                     }]
                 }
             }
@@ -185,9 +185,47 @@ describe('tailor-js', function () {
         done();
     });
 
+    it('can lazily generate CSS', function (done) {
+
+        tailor.pushHtml('<div class="container pt30"></div>');
+        tailor.pushHtml('<div class="container mb40"></div>');
+        tailor.pushPath(__dirname + '/fixtures/demo-1.html');
+
+        var generatedCss = tailor.generateLazy();
+        var expectedCss = {
+            minified: '.w1200{width:1200px;}.pt30{padding-top:30px;}.mb40{margin-bottom:40px;}',
+            formatted: '[Not Adding - It would be messy to add here]',
+            object: {
+                ".w1200": {
+                    properties: [{
+                        property: 'width',
+                        value: '1200px'
+                    }]
+                },
+                ".pt30": {
+                    properties: [{
+                        property: 'padding-top',
+                        value: '30px'
+                    }]
+                },
+                ".mb40": {
+                    properties: [{
+                        property: 'margin-bottom',
+                        value: '40px'
+                    }]
+                }
+            }
+        };
+
+        assert.equal(generatedCss.minified, expectedCss.minified);
+        assert.equal(JSON.stringify(generatedCss.object), JSON.stringify(expectedCss.object));
+
+        done();
+    });
+
     it('can generate minified CSS file', function (done) {
 
-        var outputFilePath = __dirname + '/fixtures/assets/css/tailored.min.css',
+        var outputFilePath = __dirname + '/fixtures/sample-dir/assets/css/tailored.min.css',
             generatedCss = tailor.generatePathCss(__dirname + '/fixtures/', {
                 outputPath: outputFilePath,
                 minifyOutput: true
@@ -226,15 +264,15 @@ describe('tailor-js', function () {
 
         // Remove any existing generated file
         fs.unlinkSync(outputFilePath);
-        fs.rmdirSync(__dirname + '/fixtures/assets/css');
-        fs.rmdirSync(__dirname + '/fixtures/assets');
+        fs.rmdirSync(__dirname + '/fixtures/sample-dir/assets/css');
+        fs.rmdirSync(__dirname + '/fixtures/sample-dir/assets');
 
         done();
     });
 
     it('can generate formatted CSS file', function (done) {
 
-        var outputFilePath = __dirname + '/fixtures/assets/css/tailored.css',
+        var outputFilePath = __dirname + '/fixtures/sample-dir/assets/css/tailored.css',
             generatedCss = tailor.generatePathCss(__dirname + '/fixtures/', {
                 outputPath: outputFilePath,
                 minifyOutput: false
@@ -273,8 +311,8 @@ describe('tailor-js', function () {
 
         // Remove any existing generated file
         fs.unlinkSync(outputFilePath);
-        fs.rmdirSync(__dirname + '/fixtures/assets/css');
-        fs.rmdirSync(__dirname + '/fixtures/assets');
+        fs.rmdirSync(__dirname + '/fixtures/sample-dir/assets/css');
+        fs.rmdirSync(__dirname + '/fixtures/sample-dir/assets');
 
         done();
     });
