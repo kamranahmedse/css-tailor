@@ -1,15 +1,15 @@
-# tailor-js
-[![Build Status](https://secure.travis-ci.org/kamranahmedse/tailor-js.png?branch=master)](https://travis-ci.org/kamranahmedse/tailor-js)
+# css-tailor
+[![Build Status](https://secure.travis-ci.org/kamranahmedse/css-tailor.png?branch=master)](https://travis-ci.org/kamranahmedse/css-tailor)
 > Automatically generate CSS from your HTML classes
 
 Utility that turns the classes applied upon the **DOM elements to CSS**. So that you don't have to manually write the CSS for those minor UI enhancements like increasing the padding, adding a little margin, changing the font size, applying a border radius, pumping up the line-height a bit etc. 
 
 ## Install
 
-> If you are looking for usage as a preprocessor, check [gulp-tailor-js](https://github.com/kamranahmedse/gulp-tailor-js)
+> If you are looking for usage as a preprocessor, check [gulp-css-tailor](https://github.com/kamranahmedse/gulp-css-tailor)
 
 ```bash
-$ npm install --save-dev tailor-js
+$ npm install --save-dev css-tailor
 ```
 
 ## Usage
@@ -34,7 +34,7 @@ You can provide the path in the form of
 - `array` An array of directory paths, file paths or a mix of both the directory and file paths
 
 ```js
-var tailor = require('tailor-js');
+var tailor = require('css-tailor');
 
 // Will generate the output file [if required] and return the generated CSS
 var generatedCss = tailor.generatePathCss('resources/html/', options)
@@ -45,7 +45,7 @@ var generatedCss = tailor.generatePathCss('resources/html/', options)
 Also you can generate CSS from the HTML string
 
 ```js
-var tailor = require('tailor-js');
+var tailor = require('css-tailor');
 
 // Will generate the output file [if required] and return the generated CSS
 var generatedCss = tailor.generateCss('<html>...</html>', options)

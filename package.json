@@ -1,12 +1,12 @@
 {
-  "name": "tailor-js",
+  "name": "css-tailor",
   "version": "1.0.0",
   "description": "Easily generate CSS from the HTML classes",
   "main": "index.js",
   "author": "Kamran Ahmed <kamranahmed.se@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kamranahmedse/tailor-js"
+    "url": "https://github.com/kamranahmedse/css-tailor"
   },
   "license": "MIT",
   "scripts": {
