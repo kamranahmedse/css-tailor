@@ -1,6 +1,6 @@
-# css-tailor [![Build Status](https://secure.travis-ci.org/kamranahmedse/css-tailor.svg?branch=master)](https://travis-ci.org/kamranahmedse/css-tailor) [Package Version](https://badge.fury.io/js/css-tailor.svg)
+# css-tailor  [![Build Status](https://secure.travis-ci.org/kamranahmedse/css-tailor.svg?branch=master)](https://travis-ci.org/kamranahmedse/css-tailor) ![Package Version](https://badge.fury.io/js/css-tailor.svg)
 
-> Automatically generate CSS from your HTML classes
+> ✂ Automatically generate CSS from your HTML classes
 
 Utility that turns the classes applied upon the **DOM elements to CSS**. So that you don't have to manually write the CSS for those minor UI enhancements like increasing the padding, adding a little margin, changing the font size, applying a border radius, pumping up the line-height a bit etc. 
 
