@@ -302,6 +302,18 @@ var pathsToHtml = function (paths) {
     return htmlContent;
 };
 
+/**
+ * Updates the options
+ *
+ * @param options
+ */
+var updateOptions = function (options) {
+    var tempDefaults = _.cloneDeep(defaults);
+
+    options = options || {};
+    config = _.merge(tempDefaults, options);
+};
+
 module.exports = {
 
     /**
@@ -323,13 +335,15 @@ module.exports = {
     /**
      * Generates CSS from the lazily set content
      *
-     * @returns {Object}
+     * @returns {{}|{minified: '', formatted: '', object: {}}}
      */
-    generateLazy: function () {
+    generateLazy: function (options) {
 
         if (_.isEmpty(lazyHtml) && _.isEmpty(lazyPaths)) {
             throw 'Error! No HTML or path given for lazy generation';
         }
+
+        updateOptions(options);
 
         var htmlContent = '';
 
@@ -352,10 +366,7 @@ module.exports = {
      */
     generateCss: function (htmlContent, options) {
 
-        var tempDefaults = _.cloneDeep(defaults);
-
-        options = options || {};
-        config = _.merge(tempDefaults, options);
+        updateOptions(options);
 
         var extractedValues = extractAttributeValues(lookupRegex, htmlContent),
             generatedCss = {};
