@@ -9,7 +9,7 @@ Utility that turns the classes applied upon the **DOM elements to CSS**. So that
 > If you are looking for usage as a preprocessor, check [gulp-css-tailor](https://github.com/kamranahmedse/gulp-css-tailor)
 
 ```bash
-$ npm install --save-dev css-tailor
+$ npm install --save css-tailor
 ```
 
 ## Usage
