@@ -102,6 +102,9 @@ var options = {
 };
 ```
 
+## Related
+
+- Usage as a preprocessor [gulp-css-tailor](github.com/kamranahmedse/gulp-css-tailor)
 
 ## License
 
