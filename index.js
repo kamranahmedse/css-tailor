@@ -6,17 +6,18 @@ var path = require('path'),
   _ = require('lodash');
 
 /**
- * Regex to get the required attribute off of the HTML
+ * Regex to get the required attribute values off of the HTML
  * @type {RegExp}
  */
 var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
 
 /**
  * Configuration variables
+ *
  * @type {Object}
  */
 var config = {},
-  lazyHtml = '',      // Will be holding `HTML` when running in lazy generation
+  lazyHtml = '',      // Will be holding `HTML` string when running in lazy generation
   lazyPaths = [],     // Will be holding `paths` when running in lazy generation
   defaults = {
     newLineChar: '\n',
@@ -139,6 +140,7 @@ var extractAttributeValues = function (attrRegex, htmlContent) {
 
 /**
  * Gets the mapping for the
+ *
  * @param actualUnit
  * @returns {string}
  */
@@ -320,6 +322,7 @@ module.exports = {
 
   /**
    * Pushes HTML for the lazy generation
+   *
    * @param htmlContent
    */
   pushHtml: function (htmlContent) {
@@ -328,6 +331,7 @@ module.exports = {
 
   /**
    * Pushes path for the lazy generation
+   * 
    * @param path
    */
   pushPath: function (path) {
