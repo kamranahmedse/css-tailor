@@ -8,3 +8,4 @@ coverage
 *.swp
 .idea
 yarn.lock
+package-lock.json
