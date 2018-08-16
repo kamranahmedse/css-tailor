@@ -23,6 +23,38 @@ describe('tailor-js', function () {
     done();
   });
 
+  it('can generate css from html or JSX', function (done) {
+    const generatedCss = tailor.generateCss(`<div class="container pt30"><span className='ml40'></span><span className="pb45">JSX style classnames</span></div>`);
+    const expectedCss = {
+      minified: '.pt30{padding-top:30px;}.ml40{margin-left:40px;}.pb45{padding-bottom:45px;}',
+      object: {
+        '.pt30': {
+          properties: [{
+            property: 'padding-top',
+            value: '30px'
+          }]
+        },
+        '.ml40': {
+          properties: [{
+            property: 'margin-left',
+            value: '40px'
+          }]
+        },
+        '.pb45': {
+          properties: [{
+            property: 'padding-bottom',
+            value: '45px'
+          }]
+        }
+      }
+    };
+
+    assert.equal(generatedCss.minified, expectedCss.minified);
+    assert.equal(JSON.stringify(generatedCss.object), JSON.stringify(expectedCss.object));
+
+    done();
+  });
+
   it('can optionally set all styles to important', function (done) {
     const generatedCss = tailor.generateCss('<div class="container pt30"></div>', {
       setImportant: true
@@ -215,7 +247,6 @@ describe('tailor-js', function () {
   });
 
   it('can generate minified CSS file', function (done) {
-
     const outputFilePath = __dirname + '/fixtures/sample-dir/assets/css/tailored.min.css';
 
     tailor.generatePathCss(__dirname + '/fixtures/', {
@@ -262,9 +293,7 @@ describe('tailor-js', function () {
   });
 
   it('can generate formatted CSS file', function (done) {
-
     const outputFilePath = __dirname + '/fixtures/sample-dir/assets/css/tailored.css';
-
     tailor.generatePathCss(__dirname + '/fixtures/', {
       outputPath: outputFilePath,
       minifyOutput: false

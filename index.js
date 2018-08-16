@@ -3,11 +3,8 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const _ = require('lodash');
 
-/**
- * Regex to get the required attribute values off of the HTML
- * @type {RegExp}
- */
-const lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
+// Regex to lookup class values from the HTML files
+const htmlLookupRegex = /(?:(\bclass|className\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
 
 // Configuration variables
 let config = {};
@@ -123,8 +120,11 @@ const extractAttributeValues = (attrRegex, htmlContent) => {
 
   do {
     match = attrRegex.exec(htmlContent);
-    match && match[2] && matches.push(match[2]);
 
+    if (match) {
+      let foundMatch = match[2] || match[3] || match[4];
+      foundMatch && matches.push(foundMatch);
+    }
   } while (match);
 
   return _.uniq(matches);
@@ -355,7 +355,7 @@ module.exports = {
   generateCss: function (htmlContent, options) {
     updateOptions(options);
 
-    const extractedValues = extractAttributeValues(lookupRegex, htmlContent);
+    const extractedValues = extractAttributeValues(htmlLookupRegex, htmlContent);
     if (!extractedValues || extractedValues.length === 0) {
       return {
         minified: '',
