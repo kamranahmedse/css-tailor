@@ -1,5 +1,3 @@
-'use strict';
-
 let path = require('path');
 let fs = require('fs');
 let mkdirp = require('mkdirp');
