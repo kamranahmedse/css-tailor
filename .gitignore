@@ -7,3 +7,4 @@ components
 coverage
 *.swp
 .idea
+yarn.lock

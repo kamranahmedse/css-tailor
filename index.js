@@ -1,31 +1,27 @@
 'use strict';
 
-var path = require('path'),
-  fs = require('fs'),
-  mkdirp = require('mkdirp'),
-  _ = require('lodash');
+let path = require('path');
+let fs = require('fs');
+let mkdirp = require('mkdirp');
+let _ = require('lodash');
 
 /**
  * Regex to get the required attribute values off of the HTML
  * @type {RegExp}
  */
-var lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
+const lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s*)+/g;
 
-/**
- * Configuration variables
- *
- * @type {Object}
- */
-var config = {},
-  lazyHtml = '',      // Will be holding `HTML` string when running in lazy generation
-  lazyPaths = [],     // Will be holding `paths` when running in lazy generation
-  defaults = {
-    newLineChar: '\n',
-    tabSpacing: 4,
-    outputPath: '',
-    minifyOutput: false,
-    setImportant: false
-  };
+// Configuration variables
+let config = {};
+let lazyHtml = '';      // `HTML` string when running in lazy generation
+let lazyPaths = [];     // `paths` when running in lazy generation
+let defaults = {
+  newLineChar: '\n',
+  tabSpacing: 4,
+  outputPath: '',
+  minifyOutput: false,
+  setImportant: false
+};
 
 /**
  * Mapping for the numerical properties to their respective CSS property. Later on we may
@@ -33,7 +29,7 @@ var config = {},
  *
  * @type {Object}
  */
-var propertyMapping = {
+const propertyMapping = {
 
   /**
    * Regex to check if some property value is tailorable for any of the properties below.
@@ -79,7 +75,7 @@ var propertyMapping = {
  *
  * @type {Object}
  */
-var unitMapping = {
+const unitMapping = {
   default: 'px',      // If no mapping found or empty unit given then use this
   px: 'px',
   pt: 'pt',
@@ -102,12 +98,12 @@ var unitMapping = {
  * @param dirPath      Path to get the files from
  * @param callback  Function which will be called for every found file
  */
-var getFiles = function (dirPath, callback) {
+const getFiles = function (dirPath, callback) {
 
-  var files = fs.readdirSync(dirPath);
+  const files = fs.readdirSync(dirPath);
   files.forEach(function (file) {
-    var fileName = path.join(dirPath, file),
-      stat = fs.lstatSync(fileName);
+    const fileName = path.join(dirPath, file);
+    const stat = fs.lstatSync(fileName);
 
     if (stat.isDirectory()) {
       getFiles(fileName, callback); //recurse
@@ -124,10 +120,9 @@ var getFiles = function (dirPath, callback) {
  * @param htmlContent
  * @returns {Array}
  */
-var extractAttributeValues = function (attrRegex, htmlContent) {
-
-  var matches = [],
-    match;
+const extractAttributeValues = function (attrRegex, htmlContent) {
+  const matches = [];
+  let match;
 
   do {
     match = attrRegex.exec(htmlContent);
@@ -144,7 +139,7 @@ var extractAttributeValues = function (attrRegex, htmlContent) {
  * @param actualUnit
  * @returns {string}
  */
-var getUnit = function (actualUnit) {
+const getUnit = function (actualUnit) {
   actualUnit = actualUnit || '';
   actualUnit = actualUnit.trim();
 
@@ -157,16 +152,16 @@ var getUnit = function (actualUnit) {
  * @param property
  * @returns {null|Object}
  */
-var getMappedCss = function (property) {
+const getMappedCss = function (property) {
 
-  var pieces = property.match(propertyMapping.regex),
-    cssProperty = pieces && propertyMapping[pieces[1]];
+  const pieces = property.match(propertyMapping.regex);
+  const cssProperty = pieces && propertyMapping[pieces[1]];
 
   return cssProperty && {
-      selector: '.' + property,
-      property: cssProperty,
-      value: pieces[2] + getUnit(pieces[3] || unitMapping.default) + (config.setImportant ? ' !important' : '')
-    };
+    selector: '.' + property,
+    property: cssProperty,
+    value: pieces[2] + getUnit(pieces[3] || unitMapping.default) + (config.setImportant ? ' !important' : '')
+  };
 };
 
 /**
@@ -175,26 +170,26 @@ var getMappedCss = function (property) {
  * @param extractedValues
  * @returns {Object}
  */
-var generateCss = function (extractedValues) {
+const generateCss = function (extractedValues) {
 
-  var tabSpacing = _.repeat(' ', config.tabSpacing),
-    tailoredCss = {
-      minified: '',
-      formatted: '',
-      object: {}
-    };
+  const tabSpacing = _.repeat(' ', config.tabSpacing);
+  const tailoredCss = {
+    minified: '',
+    formatted: '',
+    object: {}
+  };
 
   // For each of the extracted attribute values, parse each value
   extractedValues.forEach(function (attrValue) {
 
     attrValue = attrValue.replace(/\s+/g, ' ');
-    var valueItems = attrValue.split(' ');
+    const valueItems = attrValue.split(' ');
 
     // Since each value can have multiple properties (e.g. `p10 mt40`)
     // Split each value and iterate to generate any possible CSS
     valueItems.forEach(function (valueItem) {
 
-      var css = getMappedCss(valueItem);
+      const css = getMappedCss(valueItem);
       if (!css) {
         return;
       }
@@ -225,12 +220,12 @@ var generateCss = function (extractedValues) {
  * @param filePath
  * @returns {string}
  */
-var readHtmlFile = function (filePath) {
+const readHtmlFile = function (filePath) {
 
-  var extension = path.extname(filePath) || '',
-    html = '';
+  const extension = path.extname(filePath) || '';
+  let html = '';
 
-  if (extension.toLowerCase() == '.html') {
+  if (extension.toLowerCase() === '.html') {
     html = fs.readFileSync(filePath);
   }
 
@@ -243,14 +238,13 @@ var readHtmlFile = function (filePath) {
  * @param location
  * @returns {string}
  */
-var pathToHtml = function (location) {
-
+const pathToHtml = function (location) {
   if (!_.isString(location)) {
     throw 'Error! pathToHtml: Location must be string ' + (typeof location) + ' given';
   }
 
-  var htmlContent = '',
-    lstat = fs.lstatSync(location);
+  let htmlContent = '';
+  const lstat = fs.lstatSync(location);
 
   if (lstat.isDirectory()) {
     getFiles(location, function (filePath) {
@@ -267,15 +261,13 @@ var pathToHtml = function (location) {
  * Creates the output file using the generated CSS
  * @param css
  */
-var createOutputFile = function (css) {
-
+const createOutputFile = function (css) {
   if (!css || !config.outputPath) {
     return;
   }
 
-
-  var contents = config.minifyOutput ? css.minified : css.formatted,
-    outputPath = config.outputPath;
+  const contents = config.minifyOutput ? css.minified : css.formatted;
+  const outputPath = config.outputPath;
 
   if (!_.endsWith(outputPath, '.css')) {
     throw 'Error! Full output path is required including css filename e.g. /assets/css/tailored.css';
@@ -291,9 +283,8 @@ var createOutputFile = function (css) {
  * @param paths
  * @returns {string}
  */
-var pathsToHtml = function (paths) {
-
-  var htmlContent = '';
+const pathsToHtml = function (paths) {
+  let htmlContent = '';
 
   if (_.isArray(paths)) {
     paths.forEach(function (location) {
@@ -307,19 +298,18 @@ var pathsToHtml = function (paths) {
 };
 
 /**
- * Updates the options
+ * Updates settings if required during the CSS generation
  *
  * @param options
  */
-var updateOptions = function (options) {
-  var tempDefaults = _.cloneDeep(defaults);
+const updateOptions = function (options) {
+  const tempDefaults = _.cloneDeep(defaults);
 
   options = options || {};
   config = _.merge(tempDefaults, options);
 };
 
 module.exports = {
-
   /**
    * Pushes HTML for the lazy generation
    *
@@ -331,7 +321,7 @@ module.exports = {
 
   /**
    * Pushes path for the lazy generation
-   * 
+   *
    * @param path
    */
   pushPath: function (path) {
@@ -344,14 +334,13 @@ module.exports = {
    * @returns {{}|{minified: '', formatted: '', object: {}}}
    */
   generateLazy: function (options) {
-
     if (_.isEmpty(lazyHtml) && _.isEmpty(lazyPaths)) {
       throw 'Error! No HTML or path given for lazy generation';
     }
 
     updateOptions(options);
 
-    var htmlContent = '';
+    let htmlContent = '';
 
     htmlContent += pathsToHtml(lazyPaths);
     htmlContent += lazyHtml;
@@ -371,12 +360,9 @@ module.exports = {
    * @returns {{}|{minified: '', formatted: '', object: {}}}
    */
   generateCss: function (htmlContent, options) {
-
     updateOptions(options);
 
-    var extractedValues = extractAttributeValues(lookupRegex, htmlContent),
-      generatedCss = {};
-
+    const extractedValues = extractAttributeValues(lookupRegex, htmlContent);
     if (!extractedValues || extractedValues.length === 0) {
       return {
         minified: '',
@@ -385,8 +371,7 @@ module.exports = {
       };
     }
 
-    generatedCss = generateCss(extractedValues);
-
+    let generatedCss = generateCss(extractedValues);
     createOutputFile(generatedCss);
 
     return generatedCss;
@@ -400,14 +385,12 @@ module.exports = {
    * @returns {*|string}
    */
   generatePathCss: function (paths, options) {
-
     if (_.isEmpty(paths)) {
       throw 'Error! path is required';
     }
 
-    var htmlContent = pathsToHtml(paths);
+    const htmlContent = pathsToHtml(paths);
 
     return this.generateCss(htmlContent, options);
   }
-
 };
