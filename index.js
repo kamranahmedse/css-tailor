@@ -1,7 +1,7 @@
-let path = require('path');
-let fs = require('fs');
-let mkdirp = require('mkdirp');
-let _ = require('lodash');
+const path = require('path');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const _ = require('lodash');
 
 /**
  * Regex to get the required attribute values off of the HTML
@@ -13,7 +13,7 @@ const lookupRegex = /(?:(\bclass\b)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^"'<>\s]+))\s
 let config = {};
 let lazyHtml = '';      // `HTML` string when running in lazy generation
 let lazyPaths = [];     // `paths` when running in lazy generation
-let defaults = {
+const defaults = {
   newLineChar: '\n',
   tabSpacing: 4,
   outputPath: '',
@@ -96,10 +96,9 @@ const unitMapping = {
  * @param dirPath      Path to get the files from
  * @param callback  Function which will be called for every found file
  */
-const getFiles = function (dirPath, callback) {
-
+const getFiles = (dirPath, callback) => {
   const files = fs.readdirSync(dirPath);
-  files.forEach(function (file) {
+  files.forEach(file => {
     const fileName = path.join(dirPath, file);
     const stat = fs.lstatSync(fileName);
 
@@ -118,7 +117,7 @@ const getFiles = function (dirPath, callback) {
  * @param htmlContent
  * @returns {Array}
  */
-const extractAttributeValues = function (attrRegex, htmlContent) {
+const extractAttributeValues = (attrRegex, htmlContent) => {
   const matches = [];
   let match;
 
@@ -137,7 +136,7 @@ const extractAttributeValues = function (attrRegex, htmlContent) {
  * @param actualUnit
  * @returns {string}
  */
-const getUnit = function (actualUnit) {
+const getUnit = actualUnit => {
   actualUnit = actualUnit || '';
   actualUnit = actualUnit.trim();
 
@@ -150,7 +149,7 @@ const getUnit = function (actualUnit) {
  * @param property
  * @returns {null|Object}
  */
-const getMappedCss = function (property) {
+const getMappedCss = property => {
 
   const pieces = property.match(propertyMapping.regex);
   const cssProperty = pieces && propertyMapping[pieces[1]];
@@ -168,8 +167,7 @@ const getMappedCss = function (property) {
  * @param extractedValues
  * @returns {Object}
  */
-const generateCss = function (extractedValues) {
-
+const generateCss = extractedValues => {
   const tabSpacing = _.repeat(' ', config.tabSpacing);
   const tailoredCss = {
     minified: '',
@@ -179,14 +177,12 @@ const generateCss = function (extractedValues) {
 
   // For each of the extracted attribute values, parse each value
   extractedValues.forEach(function (attrValue) {
-
     attrValue = attrValue.replace(/\s+/g, ' ');
     const valueItems = attrValue.split(' ');
 
     // Since each value can have multiple properties (e.g. `p10 mt40`)
     // Split each value and iterate to generate any possible CSS
     valueItems.forEach(function (valueItem) {
-
       const css = getMappedCss(valueItem);
       if (!css) {
         return;
@@ -218,8 +214,7 @@ const generateCss = function (extractedValues) {
  * @param filePath
  * @returns {string}
  */
-const readHtmlFile = function (filePath) {
-
+const readHtmlFile = filePath => {
   const extension = path.extname(filePath) || '';
   let html = '';
 
@@ -236,7 +231,7 @@ const readHtmlFile = function (filePath) {
  * @param location
  * @returns {string}
  */
-const pathToHtml = function (location) {
+const pathToHtml = location => {
   if (!_.isString(location)) {
     throw 'Error! pathToHtml: Location must be string ' + (typeof location) + ' given';
   }
@@ -259,7 +254,7 @@ const pathToHtml = function (location) {
  * Creates the output file using the generated CSS
  * @param css
  */
-const createOutputFile = function (css) {
+const createOutputFile = css => {
   if (!css || !config.outputPath) {
     return;
   }
@@ -281,11 +276,11 @@ const createOutputFile = function (css) {
  * @param paths
  * @returns {string}
  */
-const pathsToHtml = function (paths) {
+const pathsToHtml = paths => {
   let htmlContent = '';
 
   if (_.isArray(paths)) {
-    paths.forEach(function (location) {
+    paths.forEach(location => {
       htmlContent += pathToHtml(location);
     });
   } else if (_.isString(paths)) {
@@ -300,7 +295,7 @@ const pathsToHtml = function (paths) {
  *
  * @param options
  */
-const updateOptions = function (options) {
+const updateOptions = options => {
   const tempDefaults = _.cloneDeep(defaults);
 
   options = options || {};
@@ -387,8 +382,6 @@ module.exports = {
       throw 'Error! path is required';
     }
 
-    const htmlContent = pathsToHtml(paths);
-
-    return this.generateCss(htmlContent, options);
+    return this.generateCss(pathsToHtml(paths), options);
   }
 };
