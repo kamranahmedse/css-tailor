@@ -15,13 +15,15 @@
     "url": "https://github.com/kamranahmedse/css-tailor"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "istanbul cover node_modules/mocha/bin/_mocha && codecov"
   },
   "dependencies": {
     "lodash": "^4.15.0",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
+    "codecov": "^3.0.4",
+    "istanbul": "^0.4.5",
     "mocha": "^5.2.0"
   },
   "engines": {
