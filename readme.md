@@ -1,6 +1,8 @@
 # ✂ css-tailor
 
-[![Build Status](https://secure.travis-ci.org/kamranahmedse/css-tailor.svg?branch=master)](https://travis-ci.org/kamranahmedse/css-tailor) ![Package Version](https://badge.fury.io/js/css-tailor.svg)
+[![Build Status](https://secure.travis-ci.org/kamranahmedse/css-tailor.svg?branch=master)](https://travis-ci.org/kamranahmedse/css-tailor)
+[![Code Coverage](https://img.shields.io/codecov/c/github/kamranahmedse/css-tailor.svg?style=flat-square)](https://travis-ci.org/kamranahmedse/css-tailor)
+![Package Version](https://badge.fury.io/js/css-tailor.svg)
 
 > Automatically generate CSS from your HTML classes
 
