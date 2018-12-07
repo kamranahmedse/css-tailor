@@ -106,6 +106,7 @@ var options = {
 
 ## Related
 
+- Webpack Plugin [stylos](https://github.com/kamranahmedse/stylos)
 - Usage as a preprocessor [gulp-css-tailor](http://github.com/kamranahmedse/gulp-css-tailor)
 
 ## License
