@@ -64,7 +64,7 @@ All the default CSS units are supported. You can specify it and relevant CSS uni
 > If you are looking for usage as a preprocessor, check [gulp-css-tailor](https://github.com/kamranahmedse/gulp-css-tailor)
 
 ```bash
-$ npm install --save css-tailor
+yarn add css-tailor
 ```
 
 #### From a Directory

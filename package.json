@@ -18,13 +18,13 @@
     "test": "istanbul cover node_modules/mocha/bin/_mocha && codecov"
   },
   "dependencies": {
-    "lodash": "^4.15.0",
+    "lodash": "^4.17.11",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
-    "codecov": "^3.0.4",
+    "codecov": "^3.5.0",
     "istanbul": "^0.4.5",
-    "mocha": "^5.2.0"
+    "mocha": "^6.1.4"
   },
   "engines": {
     "node": ">= 4"
